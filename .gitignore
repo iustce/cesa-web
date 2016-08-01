@@ -87,3 +87,9 @@ ENV/
 
 # Rope project settings
 .ropeproject
+.idea/cesa-web.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/workspace.xml
+README.md~
+project/data/
