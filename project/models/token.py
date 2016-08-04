@@ -2,8 +2,8 @@
 from datetime import datetime
 
 # project imports
-from application.extensions import db, redis
-from application.models import User
+from project.extensions import db, redis
+from project.models import User
 
 
 class Token(db.Model):
