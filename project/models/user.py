@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
+from uuid import uuid4
 
-from flask import request, abort
+from flask import request, abort, current_app, g
 from project.extensions import db, redis
 from sqlalchemy_utils import PasswordType, force_auto_coercion
+from functools import wraps
 
 force_auto_coercion()
 
@@ -22,6 +24,8 @@ class User(db.Model):
     university = db.Column(db.Enum, ('iust', 'sharif', 'tehran', 'other'))
 
     tokens = db.relationship('Token', backref='user', lazy='dynamic', cascade='all,delete')
+
+    payment = db.relationship('PaymentStatus', backref='user', lazy='dynamic', cascade='all,delete')
 
     @classmethod
     def authenticate(cls, populate=True):
@@ -56,3 +60,8 @@ class User(db.Model):
             return wrapper
 
         return decorator
+
+    def generate_access_token(self):
+        code = str(uuid4())
+        redis.setex('uat:%s' % code, current_app.config['ACCESS_TOKEN_TIMEOUT'], str(self.id))
+        return code

@@ -4,8 +4,8 @@ from datetime import datetime
 from project.extensions import db
 
 
-class News(db.Model):
-    __tablename__ = 'news'
+class Post(db.Model):
+    __tablename__ = 'posts'
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.Unicode(), nullable=True, unique=True)

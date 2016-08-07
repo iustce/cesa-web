@@ -7,9 +7,9 @@ from project.utils.validators import api_validate_schema
 
 @app.api_route('/user/')
 def get_user():
-	"""
+    """
     Get user info
-    This ednpoint does nothing
+    This endpoint does nothing
     Only returns "1"
     ---
     tags:
@@ -24,13 +24,14 @@ def get_user():
               description: The user info
               default: '1'
     """
-	return '1', 200
+
+    return '1', 200
 
 
 @app.api_route('/user/', methods=['POST'])
 @api_validate_schema('user.signup_schema')
 def signup():
-	"""
+    """
     Signup
     ---
     tags:
@@ -57,6 +58,7 @@ def signup():
       201:
         description: Created
       406:
-      	description: Invalid input
+        description: Invalid input
     """
-	return '', 201
+
+    return '', 201
