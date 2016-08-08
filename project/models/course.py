@@ -4,8 +4,8 @@ from datetime import datetime
 from project.extensions import db
 
 
-class Class(db.Model):
-    __tablename__ = 'classes'
+class Course(db.Model):
+    __tablename__ = 'courses'
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.Unicode, nullable=False)
@@ -14,4 +14,4 @@ class Class(db.Model):
     end_date = db.Column(db.DateTime, nullable=False)
     price = db.Column(db.Integer, nullable=False, default=0)
 
-    payment = db.relationship('PaymentStatus', backref='class', lazy='dynamic', cascade='all,delete')
+    payment = db.relationship('PaymentStatus', backref='course', lazy='dynamic', cascade='all,delete')

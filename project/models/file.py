@@ -4,14 +4,12 @@ from datetime import datetime
 from project.extensions import db
 
 
-class Class(db.Model):
-    __tablename__ = 'classes'
+class File(db.Model):
+    __tablename__ = 'files'
 
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.Unicode, nullable=False)
-    body = db.Column(db.UnicodeText, nullable=False)
-    start_date = db.Column(db.DateTime, nullable=False, default=datetime.now())
-    end_date = db.Column(db.DateTime, nullable=False)
-    price = db.Column(db.Integer, nullable=False, default=0)
+    url = db.Column(db.String, nullable=False)
+    path = db.Column(db.String, nullable=True)
+    kind = db.Column(db.Enum('image', 'pdf', 'file', 'music', 'other'))
 
-    payment = db.relationship('PaymentStatus', backref='class', lazy='dynamic', cascade='all,delete')
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=True)

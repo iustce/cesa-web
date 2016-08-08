@@ -11,6 +11,6 @@ class PaymentStatus(db.Model):
     date = db.Column(db.DateTime, nullable=False, default=datetime.now())
     status = db.Column(db.Enum('done', 'failed', 'waiting', 'undone'))
 
-    class_id = db.Column(db.Integer, db.ForeignKey('classes.id'), nullable=False, index=True)
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=False, index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
     payment_id = db.Column(db.Integer, db.ForeignKey('payments.id'), nullable=True)

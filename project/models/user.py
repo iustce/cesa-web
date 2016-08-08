@@ -24,8 +24,9 @@ class User(db.Model):
     university = db.Column(db.Enum, ('iust', 'sharif', 'tehran', 'other'))
 
     tokens = db.relationship('Token', backref='user', lazy='dynamic', cascade='all,delete')
+    payments = db.relationship('PaymentStatus', backref='user', lazy='dynamic', cascade='all,delete')
+    courses = db.relationship('Course', backref='user', lazy='dynamic', cascade='all,delete')
 
-    payment = db.relationship('PaymentStatus', backref='user', lazy='dynamic', cascade='all,delete')
 
     @classmethod
     def authenticate(cls, populate=True):
