@@ -14,19 +14,19 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Unicode(254), nullable=True)
+    name = db.Column(db.Unicode(254), nullable=False)
     student_id = db.Column(db.String(8), nulllabe=False, unique=True)
-    phone = db.Column(db.String(11), nullable=True, unique=True)
+    phone = db.Column(db.String(11), nullable=False, unique=True)
     national_code = db.Column(db.String(10), nullable=True, unique=True)
-    password = db.Column(PasswordType(schemes=['pbkdf2_sha512', 'md5_crypt'], deprecated=['md5_crypt']), nullable=True)
-    active = db.Column(db.Boolean, default=False, nullable=False)
+    email = db.Column(db.String, nullable=False, unique=True)
+    password = db.Column(PasswordType(schemes=['pbkdf2_sha512', 'md5_crypt'], deprecated=['md5_crypt']), nullable=False)
+    active = db.Column(db.Boolean, default=True, nullable=False)
     registered_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
-    university = db.Column(db.Enum, ('iust', 'sharif', 'tehran', 'other'))
+    university = db.Column(db.Enum, ('iust', 'sharif', 'tehran', 'other'),nullable=False)
 
     tokens = db.relationship('Token', backref='user', lazy='dynamic', cascade='all,delete')
     payments = db.relationship('PaymentStatus', backref='user', lazy='dynamic', cascade='all,delete')
     courses = db.relationship('Course', backref='user', lazy='dynamic', cascade='all,delete')
-
 
     @classmethod
     def authenticate(cls, populate=True):
