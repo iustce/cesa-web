@@ -8,6 +8,17 @@ signup_schema = Schema({
     Required('email'): Email(),
     Required('phone'): All(unicode, Length(11), Match('^09[0-9]{9}$'), lambda n: int(n)),
     Required('student_id'): All(unicode, Length(min=8, max=9), lambda x: int(x)),
-    Required('university'): In('iust', 'sharif', 'tehran', 'other'),
+    Required('university'): In(['iust', 'sharif', 'tehran', 'other']),
     Optional('national_code'): All(unicode, Length(10)),
 })
+
+refresh_schema = Schema({
+    Required('refresh'): All(unicode, Length(36)),
+    Required('access'): All(unicode, Length(36))
+})
+
+login_schema = Schema({
+    Required('student_id'): All(unicode, Length(min=8, max=9), lambda x: int(x)),
+    Required('password'): All(unicode, Length(min=3, max=32))
+})
+

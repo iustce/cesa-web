@@ -3,7 +3,6 @@ from datetime import datetime
 
 # project imports
 from project.extensions import db, redis
-from project.models import User
 
 
 class Token(db.Model):
@@ -29,7 +28,6 @@ class Token(db.Model):
         """
         :type access str
         """
-
         cls.query.filter_by(access=access).delete()
         redis.delete('uat:%s' % access)
 

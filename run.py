@@ -5,11 +5,16 @@ import os
 import subprocess
 import sys, traceback
 
+from flask.ext.script import Manager
+from database import manager as database_manager
+
 try:
     import argparse
 except:
     print 'error: please install argparse (sudo pip install argparse)'
     exit(0)
+
+
 
 fwpath = os.path.abspath(os.path.dirname(__file__))
 venv_dir = os.path.join(fwpath, 'venv')
@@ -28,12 +33,14 @@ def get_parser():
         required=False, type=str, nargs=1)
     parser.add_argument(
         '-u', '--update', help='update requirements', required=False, action='store_true')
+    parser.add_argument(
+        '--database' , help='database arguments', required=False, dest='store_true', type=str, nargs=1
+    )
     return parser
 
 
 def run():
     app.run(host='0.0.0.0', port=5000)
-
 
 def develop():
     configure_app(app, DevelopmentConfig())

@@ -15,14 +15,14 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Unicode(254), nullable=False)
-    student_id = db.Column(db.String(8), nulllabe=False, unique=True)
+    student_id = db.Column(db.String(8), nullable=False, unique=True)
     phone = db.Column(db.String(11), nullable=False, unique=True)
     national_code = db.Column(db.String(10), nullable=True, unique=True)
     email = db.Column(db.String, nullable=False, unique=True)
     password = db.Column(PasswordType(schemes=['pbkdf2_sha512', 'md5_crypt'], deprecated=['md5_crypt']), nullable=False)
     active = db.Column(db.Boolean, default=True, nullable=False)
     registered_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
-    university = db.Column(db.Enum, ('iust', 'sharif', 'tehran', 'other'),nullable=False)
+    university = db.Column(db.Enum('iust', 'sharif', 'tehran', 'other'), nullable=False)
 
     tokens = db.relationship('Token', backref='user', lazy='dynamic', cascade='all,delete')
     payments = db.relationship('PaymentStatus', backref='user', lazy='dynamic', cascade='all,delete')
@@ -66,3 +66,13 @@ class User(db.Model):
         code = str(uuid4())
         redis.setex('uat:%s' % code, current_app.config['ACCESS_TOKEN_TIMEOUT'], str(self.id))
         return code
+
+    def populate(self, json):
+        self.name = json['name']
+        self.email = json['email']
+        self.student_id = json['student_id']
+        self.phone = json['phone']
+        self.university = json['university']
+        self.password = json['password']
+        if 'national_code' in json:
+            self.national_code = json['national_code']

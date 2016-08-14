@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
 
 # project imports
-from flask import request, jsonify
+from datetime import datetime
+from uuid import uuid4
+
+from flask import request, jsonify, abort
 from project import app
-from project.models import User
+from project.extensions import db
+from project.models import User, Token
 from project.utils.validators import api_validate_schema
+from sqlalchemy.exc import IntegrityError
 
 
-@app.api_route('/user/')
+@app.api_route('/user')
 def get_user():
     """
     Get user info
@@ -30,46 +35,7 @@ def get_user():
     return '1', 200
 
 
-@app.api_route('/user/', methods=['POST'])
-@api_validate_schema('user.signup_schema')
-def signup():
-    """
-    Signup
-    ---
-    tags:
-      - user
-    parameters:
-      - name: body
-        in: body
-        type: object
-        description: info for signup
-        required: true
-        schema:
-          id: Signup
-          required:
-            - name
-            - password
-            - email
-            -
-          properties:
-            name:
-              type: string
-              description: username of user
-            password:
-              type: string
-              description: password of user
-    responses:
-      201:
-        description: Created
-      406:
-        description: Invalid input
-    """
-    json = request.json
-
-    return '', 201
-
-
-@app.api_route('/user/login/', methods=['POST'])
+@app.api_route('/user/login', methods=['POST'])
 @api_validate_schema('user.login_schema')
 def login():
     """
@@ -80,18 +46,18 @@ def login():
     parameters:
       - name: body
         in: body
-        description: username and password for login
+        description: student_id and password for login
         required: true
         schema:
           id: UserLogin
           required:
-            - login
+            - student_id
             - password
           properties:
-            login:
+            student_id:
               type: string
-              example: babyknight
-              description: Username or Email
+              example: "93522222"
+              description: student_id
             password:
               type: string
               example: baby123
@@ -113,23 +79,24 @@ def login():
     """
 
     data = request.json
-    login = data['login']
+    student_id = data['student_id']
     password = data['password']
 
-    if '@' in login:
-        user_obj = User.query.filter_by(email=login).first()
-    else:
-        user_obj = User.query.filter_by(username=login).first()
+    user_obj = User.query.filter_by(student_id=student_id).one()
 
     if not user_obj:
         return jsonify(errors='user does not exist'), 404
-    if user_obj.verify_password(password):
-        return jsonify(token=generate_token(dict(user_id=user_obj.id))), 200
 
+    if user_obj.password == password:
+        access_token = user_obj.generate_access_token()
+        token_obj = Token(user=user_obj, access=access_token, refresh=str(uuid4()))
+        db.session.add(token_obj)
+        db.session.commit()
+        return jsonify(access_token=access_token, refresh=token_obj.refresh), 200
     return jsonify(errors='wrong password'), 406
 
 
-@app.api_route('/user/signup/', methods=['POST'])
+@app.api_route('/user/signup', methods=['POST'])
 @api_validate_schema('user.signup_schema')
 def signup():
     """
@@ -140,7 +107,7 @@ def signup():
     parameters:
       - name: body
         in: body
-        description: username, email and password for signup
+        description: info for signup
         required: true
         schema:
           id: UserSignup
@@ -151,7 +118,6 @@ def signup():
             - phone
             - student_id
             - university
-            - national_code
           properties:
             name:
               type: string
@@ -166,9 +132,21 @@ def signup():
               maxLength: 32
             phone:
               type: string
-              length: 11
+              Length: 11
+              example: 09371234567
               pattern: ^09[0-9]{9}$
-            student_id
+            student_id:
+              type: string
+              Length: 8
+              example: 93522222
+            university:
+              type: string
+              enum: ['iust', 'sharif', 'tehran', 'other']
+              example: iust
+            national_code:
+              type: string
+              Length: 10
+              example: 4361234567
 
     responses:
       201:
@@ -176,23 +154,86 @@ def signup():
       400:
           description: Bad request
       406:
-          description: Username or email already exists
+          description: unique info already exists
     """
 
-    data = request.json
-    username = data['username']
-    email = data['email']
-    password = data['password']
+    json = request.json
+    email = json['email']
 
     if User.query.filter_by(email=email).first():
         return jsonify(errors='email already exists'), 406
 
     try:
-        user_obj = User(username=username, email=email)
-        user_obj.hash_password(password)
+        user_obj = User()
+        user_obj.populate(json)
         db.session.add(user_obj)
         db.session.commit()
-    except IntegrityError:
-        return jsonify(errors='username already exists'), 406
+    except IntegrityError as err:
+        db.session.rollback()
+        if "name" in str(err.orig):
+            print "name already exists"
+            return "name already exists", 406
+        elif "phone" in str(err.orig):
+            print "phone already exists"
+            return "phone already exists", 406
+        elif "student_id" in str(err.orig):
+            print "student_id already exists"
+            return "student_id already exists", 406
 
-    return '', 201
+    return jsonify(), 201
+
+
+@app.api_route('/user/refresh', methods=['POST'])
+@api_validate_schema('user.refresh_schema')
+def refresh():
+    """
+    Refresh
+    ---
+    tags:
+      - user
+    parameters:
+      - name: body
+        in: body
+        description: generate another access-token
+        required: true
+        schema:
+          id: refresh
+          required: true
+          properties:
+            access:
+              type: string
+              Length: 36
+            refresh:
+              type: string
+              Length: 36
+
+    responses:
+      200:
+        description: Successfully generated
+        schema:
+          properties:
+            access:
+              type: string
+              description: The user access token
+      400:
+          description: Bad request
+      404:
+          description: refresh not found
+      401:
+          description: wrong access
+    """
+
+    json = request.json
+    token_obj = Token.query.get(json['refresh'])
+    if not token_obj:
+        abort(404)
+
+    if token_obj.consume_access_code(json['access']):
+        token_obj.last_refresh = datetime.now()
+        access_token = token_obj.user.generate_access_token()
+        token_obj.access = access_token
+        db.session.commit()
+
+        return jsonify(access=access_token), 200
+
+    return abort(401)
