@@ -1,7 +1,7 @@
 # flask-mvc-framework
 ---------------------
 
-A mini MVC framework using flask based on [aminhp/flask-mvc](https://github.com/salimane/flask-mvc)
+A mini MVC framework using flask based on [aminhp/flask-mvc](https://github.com/AminHP/flask-mvc)
 
 
 

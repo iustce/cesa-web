@@ -15,3 +15,13 @@ class Course(db.Model):
     price = db.Column(db.Integer, nullable=False, default=0)
 
     payment = db.relationship('PaymentStatus', backref='course', lazy='dynamic', cascade='all,delete')
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'body': self.body,
+            'start_date': self.start_date,
+            'end_date': self.end_date,
+            'price': self.price
+        }

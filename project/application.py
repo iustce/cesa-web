@@ -38,7 +38,10 @@ def configure_extensions(app):
 
 def append_decorators(app):
     from decorators import create_api_route
+    from decorators import create_paginate
+
     app.api_route = create_api_route(app)
+    app.paginate = create_paginate(app)
 
 
 def load_schemas(app):

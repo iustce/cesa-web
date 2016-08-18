@@ -15,3 +15,13 @@ class Post(db.Model):
     importance = db.Column(db.SmallInteger, nullable=False, default=0)
 
     files = db.relationship('File', backref='post', lazy='dynamic', cascade='all,delete')
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'body': self.body,
+            'last_modified': self.last_modified,
+            'importance': self.importance,
+            'files': [file_obj.to_json() for file_obj in self.files]
+        }

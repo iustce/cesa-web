@@ -75,3 +75,20 @@ class User(db.Model):
         self.password = json['password']
         if 'national_code' in json:
             self.national_code = json['national_code']
+
+    def to_json(self, simplified=True):
+        if not simplified:
+            dicrionary = self.to_json()
+            dicrionary['payments'] = [payment.to_json() for payment in self.user_payments]
+            return dicrionary
+        return {
+            'id': self.id,
+            'name': self.name,
+            'student_id': self.student_id,
+            'phone': self.phone,
+            'national_code': self.national_code,
+            'email': self.email,
+            'active': self.active,
+            'registered_at': self.registered_at,
+            'university': self.university
+        }

@@ -15,6 +15,8 @@ class DefaultConfig(object):
     SECRET_KEY = 'babyknight'
     TOKEN_EXPIRE_TIME = 3600 * 24 * 3
 
+    PAGE_SIZE = 10
+
     HOME = '/var/www/myteam/'
     ACCESS_TOKEN_TIMEOUT = 60 * 5
 

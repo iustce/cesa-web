@@ -13,3 +13,11 @@ class File(db.Model):
     kind = db.Column(db.Enum('image', 'pdf', 'file', 'music', 'other', name='file_type'))
 
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=True)
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'url': self.url,
+            'path': self.path,
+            'kind': self.kind
+        }
