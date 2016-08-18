@@ -19,6 +19,8 @@ def configure_app(app, config, is_pyfile=False):
     else:
         app.config.from_object(config)
 
+    app.config.from_pyfile('environ.py', silent=True)
+
 
 def configure_extensions(app):
     from project import extensions
@@ -27,7 +29,9 @@ def configure_extensions(app):
         try:
             getattr(extensions, extension).init_app(app)
         except AttributeError as e:
-            print e
+            print e, 646864
+    extensions.redis.init_app(app, strict=True)
+    extensions.migrate.init_app(app, extensions.db)
 
 
 def append_decorators(app):

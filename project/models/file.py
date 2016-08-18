@@ -10,6 +10,6 @@ class File(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     url = db.Column(db.String, nullable=False)
     path = db.Column(db.String, nullable=True)
-    kind = db.Column(db.Enum('image', 'pdf', 'file', 'music', 'other'))
+    kind = db.Column(db.Enum('image', 'pdf', 'file', 'music', 'other', name='file_type'))
 
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=True)

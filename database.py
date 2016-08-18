@@ -15,7 +15,7 @@ def drop():
     """Drops database tables"""
     if prompt_bool("Are you sure you want to lose all your data"):
         db.drop_all()
-        redis.flushdb()
+        #redis.flushdb()
 
 
 @manager.command

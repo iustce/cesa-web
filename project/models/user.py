@@ -22,10 +22,10 @@ class User(db.Model):
     password = db.Column(PasswordType(schemes=['pbkdf2_sha512', 'md5_crypt'], deprecated=['md5_crypt']), nullable=False)
     active = db.Column(db.Boolean, default=True, nullable=False)
     registered_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
-    university = db.Column(db.Enum('iust', 'sharif', 'tehran', 'other'), nullable=False)
+    university = db.Column(db.Enum('iust', 'sharif', 'tehran', 'other', name="university"), nullable=False)
 
     tokens = db.relationship('Token', backref='user', lazy='dynamic', cascade='all,delete')
-    payments = db.relationship('PaymentStatus', backref='user', lazy='dynamic', cascade='all,delete')
+    user_payments = db.relationship('PaymentStatus', backref='user', lazy='dynamic', cascade='all,delete')
     courses = db.relationship('Course', backref='user', lazy='dynamic', cascade='all,delete')
 
     @classmethod
