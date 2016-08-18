@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask
+from project.extensions import admin, db
 
 
 def create_app(config):
@@ -10,6 +11,7 @@ def create_app(config):
     append_decorators(app)
     load_schemas(app)
     configure_apidoc(app)
+    configure_admin(app)
     return app
 
 
@@ -60,3 +62,23 @@ def configure_apidoc(app):
     from flasgger import Swagger
     app.config['SWAGGER'] = {"swagger_version": "2.0", "specs": get_specs()}
     Swagger(app)
+
+
+def configure_admin(app):
+    import project.models
+
+    from project.admin import AdminFile
+    from project.admin import UserModelView
+    from project.admin.posts import PostModelView
+    from project.admin.courses import CourseModelView
+
+    admin.add_view(UserModelView(project.models.User, db.session, name='Users',
+                                 endpoint='admin.users', url='/admin/users'))
+
+    admin.add_view(PostModelView(project.models.Post, db.session, name='Posts',
+                                 endpoint='admin.posts', url='/admin/posts'))
+
+    admin.add_view(CourseModelView(project.models.Course, db.session, name='Courses',
+                                 endpoint='admin.courses', url='/admin/courses'))
+
+    #admin.add_view(AdminFile(app.config['MEDIA_DIR'], endpoint="admin.media", url='/admin/media', name='MediaFiles'))

@@ -15,13 +15,16 @@ class DefaultConfig(object):
     SECRET_KEY = 'babyknight'
     TOKEN_EXPIRE_TIME = 3600 * 24 * 3
 
+    HOME = '/var/www/myteam/'
     ACCESS_TOKEN_TIMEOUT = 60 * 5
+
+    MEDIA_DIR = os.environ.get('MEDIA_DIR', HOME + 'media/')
 
     # CACHE
     CACHE_TYPE = 'filesystem'
     CACHE_DEFAULT_TIMEOUT = 10
     CACHE_THRESHOLD = 100
-    CACHE_DIR = os.path.join(data_dir, 'cache')
+    CACHE_DIR = os.path.join(data_dir, 'cache/')
     CACHE_NO_NULL_WARNING = True
 
 
